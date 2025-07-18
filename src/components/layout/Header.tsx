@@ -1,4 +1,3 @@
-// src/components/layout/Header.tsx
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Bell, User, Settings, Menu } from 'lucide-react';

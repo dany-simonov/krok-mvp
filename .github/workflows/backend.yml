@@ -1,0 +1,31 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          cd backend2
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run backend (background)
+        run: |
+          cd backend2
+          nohup python main.py &

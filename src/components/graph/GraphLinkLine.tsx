@@ -43,12 +43,12 @@ export const GraphLinkLine: React.FC<GraphLinkLineProps> = ({
   target,
   color = "#22c55e",
   width = 3,
-  markerEnd = true,
+  markerEnd = false,
   opacity = 0.8,
   onClick,
   isSelected,
 }) => {
-  // Центры узлов
+  // Центры портов
   const sourceCenter = {
     x: source.x + source.width / 2,
     y: source.y + source.height / 2,
@@ -57,19 +57,20 @@ export const GraphLinkLine: React.FC<GraphLinkLineProps> = ({
     x: target.x + target.width / 2,
     y: target.y + target.height / 2,
   };
-  // Точки на границе
-  const from = getRectEdgePoint(source, targetCenter);
-  const to = getRectEdgePoint(target, sourceCenter);
+  // Для портов: просто используем center
+  const from = sourceCenter;
+  const to = targetCenter;
+  // Bezier control points (node-red style)
+  const dx = Math.max(Math.abs(to.x - from.x) * 0.5, 40);
+  const c1 = { x: from.x + dx, y: from.y };
+  const c2 = { x: to.x - dx, y: to.y };
 
   return (
-    <line
-      x1={from.x}
-      y1={from.y}
-      x2={to.x}
-      y2={to.y}
+    <path
+      d={`M${from.x},${from.y} C${c1.x},${c1.y} ${c2.x},${c2.y} ${to.x},${to.y}`}
+      fill="none"
       stroke={isSelected ? "#f59e42" : color}
       strokeWidth={width}
-      markerEnd={markerEnd ? "url(#arrowhead)" : undefined}
       opacity={opacity}
       style={{ cursor: onClick ? "pointer" : undefined }}
       onClick={onClick}

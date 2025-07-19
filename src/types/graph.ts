@@ -1,6 +1,29 @@
+export type NodeType =
+  | "server"
+  | "database"
+  | "network"
+  | "service"
+  | "api"
+  | "storage"
+  | "inject"
+  | "debug"
+  | "function"
+  | "change"
+  | "switch"
+  | "template"
+  | "mqtt"
+  | "http"
+  | "file"
+  | "rbe"
+  | "serial"
+  | "json"
+  | "split"
+  | "delay"
+  | "link";
+
 export interface GraphNode {
   id: string;
-  type: "server" | "database" | "network" | "service" | "api" | "storage";
+  type: NodeType;
   name: string;
   x: number;
   y: number;
@@ -12,6 +35,8 @@ export interface GraphNode {
     network?: number;
   };
   properties: Record<string, any>;
+  input?: boolean | string[]; // true/false или список входов
+  output?: boolean | string[]; // true/false или список выходов
 }
 
 export interface GraphLink {

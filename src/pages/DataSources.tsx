@@ -1,20 +1,19 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Database, 
-  Server, 
-  Plus, 
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Database,
+  Server,
+  Plus,
   Settings,
   CheckCircle,
   AlertCircle,
-  Loader2
-} from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 
 const DataSources: React.FC = () => {
@@ -22,26 +21,16 @@ const DataSources: React.FC = () => {
 
   const handleConnect = async (sourceName: string) => {
     setIsConnecting(true);
-    
-    toast({
-      title: "Здравствуйте!",
-      description: `Подключаемся к ${sourceName}...`,
-    });
+
+    toast.success(`Подключаемся к ${sourceName}...`);
 
     setTimeout(() => {
-      toast({
-        title: "Загружаем...",
-        description: "Проверяем доступность сервиса",
-      });
+      toast.success("Проверяем доступность сервиса");
     }, 1000);
 
     setTimeout(() => {
       setIsConnecting(false);
-      toast({
-        title: "Загружено!",
-        description: `Успешно подключились к ${sourceName}`,
-        variant: "default",
-      });
+      toast.success(`Успешно подключились к ${sourceName}`);
     }, 3000);
   };
 
@@ -78,20 +67,22 @@ const DataSources: React.FC = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="prometheus-url">URL сервера</Label>
-              <Input 
-                id="prometheus-url" 
-                value="http://prometheus.krokos.local:9090" 
-                readOnly 
+              <Input
+                id="prometheus-url"
+                value="http://prometheus.krokos.local:9090"
+                readOnly
               />
             </div>
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
-                onClick={() => handleConnect('Prometheus')}
+                onClick={() => handleConnect("Prometheus")}
                 disabled={isConnecting}
               >
-                {isConnecting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                {isConnecting ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : null}
                 Тест соединения
               </Button>
               <Button variant="outline" size="sm">
@@ -112,33 +103,38 @@ const DataSources: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm">Статус подключения:</span>
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+              <Badge
+                variant="secondary"
+                className="bg-yellow-100 text-yellow-800"
+              >
                 <AlertCircle className="h-3 w-3 mr-1" />
                 Настройка
               </Badge>
             </div>
             <div className="space-y-2">
               <Label htmlFor="k8s-url">API сервер</Label>
-              <Input 
-                id="k8s-url" 
-                placeholder="https://k8s-api.krokos.local:6443" 
+              <Input
+                id="k8s-url"
+                placeholder="https://k8s-api.krokos.local:6443"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="k8s-token">Токен доступа</Label>
-              <Input 
-                id="k8s-token" 
+              <Input
+                id="k8s-token"
                 type="password"
-                placeholder="••••••••••••••••" 
+                placeholder="••••••••••••••••"
               />
             </div>
             <div className="flex gap-2">
-              <Button 
+              <Button
                 size="sm"
-                onClick={() => handleConnect('Kubernetes')}
+                onClick={() => handleConnect("Kubernetes")}
                 disabled={isConnecting}
               >
-                {isConnecting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                {isConnecting ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : null}
                 Подключить
               </Button>
               <Button variant="outline" size="sm">

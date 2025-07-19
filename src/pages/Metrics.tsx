@@ -1,18 +1,17 @@
-
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Activity, 
-  AlertTriangle, 
-  CheckCircle, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle,
   RefreshCw,
   Server,
   Database,
-  Network
-} from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+  Network,
+} from "lucide-react";
+import { toast } from "@/components/ui/sonner";
 
 const Metrics: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,36 +19,23 @@ const Metrics: React.FC = () => {
 
   const handleRefresh = async () => {
     setIsLoading(true);
-    toast({
-      title: "Здравствуйте!",
-      description: "Начинаем обновление метрик...",
-    });
+    toast.success("Начинаем обновление метрик...");
 
     // Имитация загрузки
     setTimeout(() => {
-      toast({
-        title: "Загружаем...",
-        description: "Получаем данные с серверов мониторинга",
-      });
+      toast.success("Получаем данные с серверов мониторинга");
     }, 1000);
 
     setTimeout(() => {
       setIsLoading(false);
       setLastUpdate(new Date());
-      toast({
-        title: "Загружено!",
-        description: "Метрики успешно обновлены",
-        variant: "default",
-      });
+      toast.success("Метрики успешно обновлены");
     }, 3000);
   };
 
   useEffect(() => {
     // Автоматическое приветствие при загрузке страницы
-    toast({
-      title: "Здравствуйте!",
-      description: "Добро пожаловать в раздел метрик",
-    });
+    toast.success("Добро пожаловать в раздел метрик");
   }, []);
 
   return (
@@ -57,7 +43,9 @@ const Metrics: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Метрики и мониторинг</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Метрики и мониторинг
+          </h1>
           <p className="text-gray-600 mt-1">
             Real-time мониторинг состояния инфраструктуры
           </p>
@@ -66,14 +54,16 @@ const Metrics: React.FC = () => {
           <span className="text-sm text-gray-500">
             Обновлено: {lastUpdate.toLocaleTimeString()}
           </span>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleRefresh}
             disabled={isLoading}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            {isLoading ? 'Загружаем...' : 'Обновить'}
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
+            />
+            {isLoading ? "Загружаем..." : "Обновить"}
           </Button>
         </div>
       </div>
@@ -114,7 +104,9 @@ const Metrics: React.FC = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Сетевые устройства</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Сетевые устройства
+            </CardTitle>
             <Network className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -141,7 +133,9 @@ const Metrics: React.FC = () => {
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5 text-red-600" />
                 <div>
-                  <div className="font-medium text-red-800">Высокая нагрузка на DB-01</div>
+                  <div className="font-medium text-red-800">
+                    Высокая нагрузка на DB-01
+                  </div>
                   <div className="text-sm text-red-600">CPU: 95%, RAM: 87%</div>
                 </div>
               </div>
@@ -152,8 +146,12 @@ const Metrics: React.FC = () => {
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5 text-yellow-600" />
                 <div>
-                  <div className="font-medium text-yellow-800">Медленный ответ API</div>
-                  <div className="text-sm text-yellow-600">Время ответа: 2.3s</div>
+                  <div className="font-medium text-yellow-800">
+                    Медленный ответ API
+                  </div>
+                  <div className="text-sm text-yellow-600">
+                    Время ответа: 2.3s
+                  </div>
                 </div>
               </div>
               <Badge variant="secondary">Предупреждение</Badge>
@@ -163,8 +161,12 @@ const Metrics: React.FC = () => {
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5 text-yellow-600" />
                 <div>
-                  <div className="font-medium text-yellow-800">Место на диске заканчивается</div>
-                  <div className="text-sm text-yellow-600">Свободно: 15% на /var/log</div>
+                  <div className="font-medium text-yellow-800">
+                    Место на диске заканчивается
+                  </div>
+                  <div className="text-sm text-yellow-600">
+                    Свободно: 15% на /var/log
+                  </div>
                 </div>
               </div>
               <Badge variant="secondary">Предупреждение</Badge>
@@ -183,7 +185,8 @@ const Metrics: React.FC = () => {
             <Activity className="h-16 w-16 mx-auto mb-4 opacity-50" />
             <h3 className="text-lg font-medium mb-2">Графики метрик</h3>
             <p className="text-sm">
-              Здесь будут отображаться детальные графики<br />
+              Здесь будут отображаться детальные графики
+              <br />
               производительности и исторические данные
             </p>
           </div>

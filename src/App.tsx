@@ -1,5 +1,4 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -36,8 +35,23 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
+        <Toaster
+          position="top-right"
+          theme="light"
+          duration={3500}
+          closeButton
+          toastOptions={{
+            style: {
+              background: '#fff',
+              color: '#222',
+              borderRadius: '10px',
+              boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)',
+              fontSize: '1rem',
+              fontWeight: 500,
+              border: '1px solid #e5e7eb',
+            },
+          }}
+        />
         <BrowserRouter basename="/krok-mvp">
           <AppRoutes />
         </BrowserRouter>

@@ -35,195 +35,31 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   flow,
   isNodeSelected,
 }) => {
-  const [localNode, setLocalNode] = React.useState<GraphNode | null>(null);
-
-  React.useEffect(() => {
-    setLocalNode(selectedNode);
-  }, [selectedNode]);
-
-  // Если не выбран узел — показываем инфо о потоке
-  if (!isNodeSelected) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Информация о потоке</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="font-bold">{flow.name}</div>
-            <div className="text-sm text-gray-600">ID: {flow.id}</div>
-            <div className="text-sm">Узлов: {flow.nodes.length}</div>
-            <div className="text-sm">Связей: {flow.links.length}</div>
-            <div className="text-xs text-gray-500 pt-2">
-              Здесь вы можете создавать и настраивать потоки обработки данных,
-              соединяя инфраструктурные компоненты.
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const handleSave = () => {
-    if (localNode) {
-      onUpdateNode(localNode.id, localNode);
-      toast.success("Свойства узла сохранены");
-    }
-  };
-
-  const handleDelete = () => {
-    if (localNode) {
-      onDeleteNode(localNode.id);
-      toast.success("Узел удален");
-    }
-  };
-
-  const updateLocalNode = (updates: Partial<GraphNode>) => {
-    if (localNode) {
-      setLocalNode({ ...localNode, ...updates });
-    }
-  };
-
-  if (!localNode) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Свойства</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center text-gray-500 py-8">
-            <Settings className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p className="text-sm">
-              Выберите узел для
-              <br />
-              редактирования свойств
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Найти все связи, где этот узел — source или target
-  const relatedLinks = links.filter(
-    (l) => l.source === localNode.id || l.target === localNode.id
-  );
-
+  // Всегда показываем настройки потока
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Свойства узла</CardTitle>
+        <CardTitle className="text-lg">Информация о потоке</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="node-name">Название</Label>
-          <Input
-            id="node-name"
-            value={localNode.name}
-            onChange={(e) => updateLocalNode({ name: e.target.value })}
-            placeholder="Введите название"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Тип</Label>
-          <Select
-            value={localNode.type}
-            onValueChange={(value) => updateLocalNode({ type: value as any })}
-            disabled={!!localNode.id} // Нельзя менять тип, если узел уже создан
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="server">Сервер</SelectItem>
-              <SelectItem value="database">База данных</SelectItem>
-              <SelectItem value="network">Сеть</SelectItem>
-              <SelectItem value="service">Сервис</SelectItem>
-              <SelectItem value="api">API</SelectItem>
-              <SelectItem value="storage">Хранилище</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Статус</Label>
-          <Select
-            value={localNode.status}
-            onValueChange={(value) => updateLocalNode({ status: value as any })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="healthy">Здоровый</SelectItem>
-              <SelectItem value="warning">Предупреждение</SelectItem>
-              <SelectItem value="critical">Критический</SelectItem>
-              <SelectItem value="unknown">Неизвестно</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="node-health">Здоровье (%)</Label>
-          <Input
-            id="node-health"
-            type="number"
-            min="0"
-            max="100"
-            value={localNode.health}
-            onChange={(e) =>
-              updateLocalNode({ health: parseInt(e.target.value) || 0 })
-            }
-            // disabled={...} // НЕ ставим disabled, чтобы можно было редактировать
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 pt-4">
-          <Button onClick={handleSave} size="sm" className="w-full">
-            <Save className="h-4 w-4 mr-2" />
-            Сохранить
-          </Button>
-          <Button
-            onClick={handleDelete}
-            variant="destructive"
-            size="sm"
-            className="w-full"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Удалить
-          </Button>
-        </div>
-
-        <div className="pt-4 border-t">
-          <div className="text-sm text-gray-600 space-y-1">
-            <div>ID: {localNode.id}</div>
-            <div>
-              Позиция: {Math.round(localNode.x)}, {Math.round(localNode.y)}
-            </div>
+      <CardContent>
+        <div className="space-y-2 mb-4">
+          <div className="font-bold">{flow.name}</div>
+          <div className="text-sm text-gray-600">ID: {flow.id}</div>
+          <div className="text-sm">Узлов: {flow.nodes.length}</div>
+          <div className="text-sm">Связей: {flow.links.length}</div>
+          <div className="text-xs text-gray-500 pt-2">
+            Здесь вы можете создавать и настраивать потоки обработки данных,
+            соединяя инфраструктурные компоненты.
           </div>
         </div>
-        {/* Список связей */}
-        {relatedLinks.length > 0 && (
-          <div className="pt-4 border-t">
-            <div className="font-semibold text-sm mb-2">Связи этого узла:</div>
-            <ul className="space-y-1">
-              {relatedLinks.map((link) => (
-                <li key={link.id}>
-                  <button
-                    className={`text-xs px-2 py-1 rounded transition border ${
-                      selectedLinkId === link.id
-                        ? "bg-orange-100 border-orange-400 font-bold"
-                        : "bg-gray-100 border-gray-300"
-                    } hover:bg-orange-50`}
-                    onClick={() => onSelectLink(link.id)}
-                  >
-                    {link.source === localNode.id ? "→" : "←"} {link.source} -{" "}
-                    {link.target} [{link.type}] ({link.status})
-                  </button>
-                </li>
-              ))}
-            </ul>
+        {/* Если выбран узел — показываем только id и тип */}
+        {isNodeSelected && selectedNode && (
+          <div className="pt-2 border-t mt-2">
+            <div className="font-semibold text-sm mb-2">Выбранный узел</div>
+            <div className="text-xs text-gray-500 mb-1">ID</div>
+            <div className="mb-2 text-sm font-mono">{selectedNode.id}</div>
+            <div className="text-xs text-gray-500 mb-1">Тип</div>
+            <div className="mb-2 text-sm font-mono">{selectedNode.type}</div>
           </div>
         )}
       </CardContent>

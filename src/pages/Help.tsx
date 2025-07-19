@@ -1,50 +1,37 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  HelpCircle, 
-  Search, 
-  Book, 
-  MessageCircle, 
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  HelpCircle,
+  Search,
+  Book,
+  MessageCircle,
   Mail,
   FileText,
   Video,
-  Download
-} from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+  Download,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const Help: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      toast({
-        title: "Здравствуйте!",
-        description: `Ищем информацию по запросу: "${searchQuery}"`,
-      });
+      toast.success(`Ищем информацию по запросу: "${searchQuery}"`);
 
       setTimeout(() => {
-        toast({
-          title: "Загружено!",
-          description: "Результаты поиска готовы",
-        });
+        toast.success("Результаты поиска готовы");
       }, 1500);
     }
   };
 
   const handleContactSupport = () => {
-    toast({
-      title: "Здравствуйте!",
-      description: "Подключаемся к службе поддержки...",
-    });
+    toast.success("Подключаемся к службе поддержки...");
 
     setTimeout(() => {
-      toast({
-        title: "Загружено!",
-        description: "Ваш запрос отправлен в поддержку",
-      });
+      toast.success("Ваш запрос отправлен в поддержку");
     }, 2000);
   };
 
@@ -53,7 +40,9 @@ const Help: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Справка и поддержка</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Справка и поддержка
+          </h1>
           <p className="text-gray-600 mt-1">
             Документация, руководства и техническая поддержка
           </p>
@@ -71,12 +60,10 @@ const Help: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
               />
             </div>
-            <Button onClick={handleSearch}>
-              Найти
-            </Button>
+            <Button onClick={handleSearch}>Найти</Button>
           </div>
         </CardContent>
       </Card>
@@ -149,34 +136,44 @@ const Help: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             <div className="border-b border-gray-200 pb-4">
-              <h3 className="font-medium mb-2">Как добавить новый узел в граф?</h3>
+              <h3 className="font-medium mb-2">
+                Как добавить новый узел в граф?
+              </h3>
               <p className="text-sm text-gray-600">
-                Перейдите в раздел "Редактор графа", выберите нужный тип узла из панели инструментов 
-                и перетащите его на холст. Затем настройте свойства узла в инспекторе.
+                Перейдите в раздел "Редактор графа", выберите нужный тип узла из
+                панели инструментов и перетащите его на холст. Затем настройте
+                свойства узла в инспекторе.
               </p>
             </div>
 
             <div className="border-b border-gray-200 pb-4">
-              <h3 className="font-medium mb-2">Как настроить подключение к Prometheus?</h3>
+              <h3 className="font-medium mb-2">
+                Как настроить подключение к Prometheus?
+              </h3>
               <p className="text-sm text-gray-600">
-                В разделе "Источники данных" найдите карточку Prometheus, введите URL сервера 
-                и нажмите "Тест соединения" для проверки доступности.
+                В разделе "Источники данных" найдите карточку Prometheus,
+                введите URL сервера и нажмите "Тест соединения" для проверки
+                доступности.
               </p>
             </div>
 
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-medium mb-2">Как настроить алерты?</h3>
               <p className="text-sm text-gray-600">
-                В разделе "Метрики" настройте условия срабатывания алертов, выберите каналы 
-                уведомлений и установите пороговые значения для каждого типа метрик.
+                В разделе "Метрики" настройте условия срабатывания алертов,
+                выберите каналы уведомлений и установите пороговые значения для
+                каждого типа метрик.
               </p>
             </div>
 
             <div>
-              <h3 className="font-medium mb-2">Какие роли пользователей поддерживаются?</h3>
+              <h3 className="font-medium mb-2">
+                Какие роли пользователей поддерживаются?
+              </h3>
               <p className="text-sm text-gray-600">
-                Система поддерживает три роли: Viewer (просмотр), Editor (редактирование графов) 
-                и Admin (полный доступ к настройкам и управлению пользователями).
+                Система поддерживает три роли: Viewer (просмотр), Editor
+                (редактирование графов) и Admin (полный доступ к настройкам и
+                управлению пользователями).
               </p>
             </div>
           </div>
@@ -204,18 +201,18 @@ const Help: React.FC = () => {
             <div className="space-y-3">
               <h3 className="font-medium">Быстрая связь</h3>
               <div className="space-y-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="w-full justify-start"
                   onClick={handleContactSupport}
                 >
                   <Mail className="h-4 w-4 mr-2" />
                   Отправить запрос
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="w-full justify-start"
                   onClick={handleContactSupport}
                 >

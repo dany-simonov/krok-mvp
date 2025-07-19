@@ -212,9 +212,9 @@ const DataSources: React.FC = () => {
                   <div className="text-sm text-gray-500">Временные ряды</div>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="w-full">
+              {/* <Button variant="outline" size="sm" className="w-full">
                 Настроить
-              </Button>
+              </Button> */}
             </div>
 
             {/* Grafana data source */}
@@ -226,9 +226,9 @@ const DataSources: React.FC = () => {
                   <div className="text-sm text-gray-500">Дашборды</div>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="w-full">
+              {/* <Button variant="outline" size="sm" className="w-full">
                 Настроить
-              </Button>
+              </Button> */}
             </div>
 
             {/* ElasticSearch data source */}
@@ -240,9 +240,9 @@ const DataSources: React.FC = () => {
                   <div className="text-sm text-gray-500">Логи и поиск</div>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="w-full">
+              {/* <Button variant="outline" size="sm" className="w-full">
                 Настроить
-              </Button>
+              </Button> */}
             </div>
           </div>
         </CardContent>

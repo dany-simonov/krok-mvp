@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend2
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend2:/app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/app
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend

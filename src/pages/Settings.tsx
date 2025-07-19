@@ -4,8 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Users, Shield, Save, Plus, Edit, Trash2, Loader2, X, User 
+import {
+  Users,
+  Shield,
+  Save,
+  Plus,
+  Edit,
+  Trash2,
+  Loader2,
+  X,
+  User,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -56,45 +64,45 @@ const DEFAULT_SETTINGS: SettingsData = {
 
 const Settings: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
-  const [users, setUsers] = useState<User[]>([
-    { id: "1", email: "admin@krokos.com", role: "admin", name: "Администратор" },
-    { id: "2", email: "editor@krokos.com", role: "editor", name: "Редактор" },
-    { id: "3", email: "viewer@krokos.com", role: "viewer", name: "Наблюдатель" },
-  ]);
-  
+  const [users, setUsers] = useState<User[]>([]);
+
   // Состояния для управления пользователями
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
-  
+
   // Состояние для настроек
   const [settings, setSettings] = useState<SettingsData>(DEFAULT_SETTINGS);
-  
+
   // Загрузка сохраненных настроек при монтировании
   useEffect(() => {
     const savedSettings = localStorage.getItem("app-settings");
     if (savedSettings) {
       setSettings(JSON.parse(savedSettings));
     }
-    
-    const savedUsers = localStorage.getItem("app-users");
-    if (savedUsers) {
-      setUsers(JSON.parse(savedUsers));
-    }
+
+    // Загрузка пользователей с backend
+    fetch("/api/v1/users")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Пользователи из API:", data); // <-- добавьте это
+        setUsers(data);
+      })
+      .catch(() => setUsers([]));
   }, []);
 
   const handleSave = async () => {
     setIsSaving(true);
-    
+
     try {
       // Сохраняем в localStorage
       localStorage.setItem("app-settings", JSON.stringify(settings));
       localStorage.setItem("app-users", JSON.stringify(users));
-      
+
       // Имитация запроса к API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       toast.success("Настройки успешно сохранены");
     } catch (error) {
       toast.error("Ошибка при сохранении настроек");
@@ -109,7 +117,7 @@ const Settings: React.FC = () => {
       email: "",
       role: "viewer",
       name: "",
-      password: ""
+      password: "",
     });
     setIsUserModalOpen(true);
   };
@@ -124,7 +132,7 @@ const Settings: React.FC = () => {
     setIsDeleteConfirmOpen(true);
   };
 
-  const handleSaveUser = () => {
+  const handleSaveUser = async () => {
     if (!currentUser) return;
 
     // Валидация
@@ -133,53 +141,96 @@ const Settings: React.FC = () => {
       return;
     }
 
-    // Добавление нового пользователя
-    if (!currentUser.id) {
-      const newUser = {
-        ...currentUser,
-        id: `user_${Date.now()}`
-      };
-      setUsers([...users, newUser]);
-      toast.success(`Пользователь ${newUser.email} добавлен`);
-    } 
-    // Редактирование существующего
-    else {
-      setUsers(users.map(u => u.id === currentUser.id ? currentUser : u));
-      toast.success(`Пользователь ${currentUser.email} обновлен`);
-    }
+    try {
+      let response;
+      if (currentUser.id) {
+        // Редактирование существующего пользователя
+        response = await fetch(`/api/v1/users/${currentUser.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: currentUser.name,
+            email: currentUser.email,
+            password: currentUser.password || "",
+            role: currentUser.role,
+          }),
+        });
+      } else {
+        // Добавление нового пользователя
+        response = await fetch("/api/v1/users/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: currentUser.name,
+            email: currentUser.email,
+            password: currentUser.password,
+            role: currentUser.role,
+          }),
+        });
+      }
 
-    setIsUserModalOpen(false);
-    setCurrentUser(null);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || "Ошибка при сохранении пользователя");
+      }
+
+      toast.success(`Пользователь ${currentUser.email} сохранён`);
+      setIsUserModalOpen(false);
+      setCurrentUser(null);
+
+      // Перезагрузить пользователей с backend
+      fetch("/api/v1/users")
+        .then((res) => res.json())
+        .then((data) => setUsers(data));
+    } catch (error: any) {
+      toast.error(error.message || "Ошибка при сохранении пользователя");
+    }
   };
 
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     if (!userToDelete) return;
-    
-    setUsers(users.filter(u => u.id !== userToDelete.id));
-    toast.success(`Пользователь ${userToDelete.email} удален`);
-    
-    setIsDeleteConfirmOpen(false);
-    setUserToDelete(null);
+
+    try {
+      const response = await fetch(`/api/v1/users/${userToDelete.id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || "Ошибка при удалении пользователя");
+      }
+      toast.success(`Пользователь ${userToDelete.email} удалён`);
+      setIsDeleteConfirmOpen(false);
+      setUserToDelete(null);
+      // Перезагрузить пользователей с backend
+      fetch("/api/v1/users")
+        .then((res) => res.json())
+        .then((data) => setUsers(data));
+    } catch (error: any) {
+      toast.error(error.message || "Ошибка при удалении пользователя");
+    }
   };
 
   const handleUserInputChange = (field: keyof User, value: string) => {
     if (!currentUser) return;
-    
+
     setCurrentUser({
       ...currentUser,
-      [field]: value
+      [field]: value,
     });
   };
 
-  const handleSettingsChange = (field: keyof SettingsData, value: string | number) => {
-    setSettings(prev => ({
+  const handleSettingsChange = (
+    field: keyof SettingsData,
+    value: string | number
+  ) => {
+    setSettings((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const getRoleBadge = (role: string) => {
-    switch(role) {
+    switch (role) {
       case "admin":
         return <Badge className="bg-blue-500">Admin</Badge>;
       case "editor":
@@ -234,16 +285,16 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Добавлен контейнер с фиксированной высотой и прокруткой */}
-            <div 
-              className="space-y-3 overflow-y-auto" 
-              style={{ 
-                maxHeight: '300px',
-                overflowY: users.length >= 4 ? 'auto' : 'visible'  // >4 
+            <div
+              className="space-y-3 overflow-y-auto"
+              style={{
+                maxHeight: "300px",
+                overflowY: users.length >= 4 ? "auto" : "visible", // >4
               }}
             >
-              {users.map(user => (
-                <div 
-                  key={user.id} 
+              {users.map((user) => (
+                <div
+                  key={user.id}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                 >
                   <div>
@@ -277,7 +328,6 @@ const Settings: React.FC = () => {
           </CardContent>
         </Card>
 
-
         {/* Security Settings */}
         <Card>
           <CardHeader>
@@ -289,21 +339,25 @@ const Settings: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="session-timeout">Время сессии (часы)</Label>
-              <Input 
-                id="session-timeout" 
-                type="number" 
+              <Input
+                id="session-timeout"
+                type="number"
                 value={settings.sessionTimeout}
-                onChange={(e) => handleSettingsChange("sessionTimeout", Number(e.target.value))}
+                onChange={(e) =>
+                  handleSettingsChange("sessionTimeout", Number(e.target.value))
+                }
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password-policy">Минимальная длина пароля</Label>
-              <Input 
-                id="password-policy" 
-                type="number" 
+              <Input
+                id="password-policy"
+                type="number"
                 value={settings.passwordPolicy}
-                onChange={(e) => handleSettingsChange("passwordPolicy", Number(e.target.value))}
+                onChange={(e) =>
+                  handleSettingsChange("passwordPolicy", Number(e.target.value))
+                }
               />
             </div>
 
@@ -312,7 +366,9 @@ const Settings: React.FC = () => {
               <Input
                 id="api-endpoint"
                 value={settings.apiEndpoint}
-                onChange={(e) => handleSettingsChange("apiEndpoint", e.target.value)}
+                onChange={(e) =>
+                  handleSettingsChange("apiEndpoint", e.target.value)
+                }
               />
             </div>
 
@@ -320,11 +376,13 @@ const Settings: React.FC = () => {
               <Label htmlFor="backup-interval">
                 Интервал резервного копирования (дни)
               </Label>
-              <Input 
-                id="backup-interval" 
-                type="number" 
+              <Input
+                id="backup-interval"
+                type="number"
                 value={settings.backupInterval}
-                onChange={(e) => handleSettingsChange("backupInterval", Number(e.target.value))}
+                onChange={(e) =>
+                  handleSettingsChange("backupInterval", Number(e.target.value))
+                }
               />
             </div>
           </CardContent>
@@ -342,39 +400,50 @@ const Settings: React.FC = () => {
               <Label htmlFor="refresh-interval">
                 Интервал обновления данных (сек)
               </Label>
-              <Input 
-                id="refresh-interval" 
-                type="number" 
+              <Input
+                id="refresh-interval"
+                type="number"
                 value={settings.refreshInterval}
-                onChange={(e) => handleSettingsChange("refreshInterval", Number(e.target.value))}
+                onChange={(e) =>
+                  handleSettingsChange(
+                    "refreshInterval",
+                    Number(e.target.value)
+                  )
+                }
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="max-nodes">Максимальное количество узлов</Label>
-              <Input 
-                id="max-nodes" 
-                type="number" 
+              <Input
+                id="max-nodes"
+                type="number"
                 value={settings.maxNodes}
-                onChange={(e) => handleSettingsChange("maxNodes", Number(e.target.value))}
+                onChange={(e) =>
+                  handleSettingsChange("maxNodes", Number(e.target.value))
+                }
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="log-level">Уровень логирования</Label>
-              <Input 
-                id="log-level" 
+              <Input
+                id="log-level"
                 value={settings.logLevel}
-                onChange={(e) => handleSettingsChange("logLevel", e.target.value)}
+                onChange={(e) =>
+                  handleSettingsChange("logLevel", e.target.value)
+                }
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="storage-path">Путь к данным</Label>
-              <Input 
-                id="storage-path" 
+              <Input
+                id="storage-path"
                 value={settings.storagePath}
-                onChange={(e) => handleSettingsChange("storagePath", e.target.value)}
+                onChange={(e) =>
+                  handleSettingsChange("storagePath", e.target.value)
+                }
               />
             </div>
           </div>
@@ -386,13 +455,15 @@ const Settings: React.FC = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {currentUser?.id ? "Редактировать пользователя" : "Добавить пользователя"}
+              {currentUser?.id
+                ? "Редактировать пользователя"
+                : "Добавить пользователя"}
             </DialogTitle>
             <DialogDescription>
               Заполните информацию о пользователе
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email *</Label>
@@ -403,7 +474,7 @@ const Settings: React.FC = () => {
                 placeholder="user@example.com"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="name">Имя *</Label>
               <Input
@@ -413,7 +484,7 @@ const Settings: React.FC = () => {
                 placeholder="Имя пользователя"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="role">Роль</Label>
               <Select
@@ -430,7 +501,7 @@ const Settings: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {!currentUser?.id && (
               <div className="space-y-2">
                 <Label htmlFor="password">Пароль *</Label>
@@ -438,19 +509,23 @@ const Settings: React.FC = () => {
                   id="password"
                   type="password"
                   value={currentUser?.password || ""}
-                  onChange={(e) => handleUserInputChange("password", e.target.value)}
+                  onChange={(e) =>
+                    handleUserInputChange("password", e.target.value)
+                  }
                   placeholder="Создайте пароль"
                 />
               </div>
             )}
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsUserModalOpen(false)}>
               Отмена
             </Button>
             <Button onClick={handleSaveUser}>
-              {currentUser?.id ? "Сохранить изменения" : "Добавить пользователя"}
+              {currentUser?.id
+                ? "Сохранить изменения"
+                : "Добавить пользователя"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -465,7 +540,7 @@ const Settings: React.FC = () => {
               Вы уверены, что хотите удалить пользователя {userToDelete?.email}?
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="py-4">
             <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
               <div className="bg-gray-200 rounded-full p-2">
@@ -479,13 +554,16 @@ const Settings: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteConfirmOpen(false)}
+            >
               Отмена
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleDeleteUser}
               className="flex items-center gap-1"
             >

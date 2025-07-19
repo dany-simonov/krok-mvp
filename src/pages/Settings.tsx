@@ -75,21 +75,46 @@ const Settings: React.FC = () => {
   // Состояние для настроек
   const [settings, setSettings] = useState<SettingsData>(DEFAULT_SETTINGS);
 
-  // Загрузка сохраненных настроек при монтировании
+  // Загрузка сохраненных настроек и пользователей при монтировании
   useEffect(() => {
     const savedSettings = localStorage.getItem("app-settings");
     if (savedSettings) {
       setSettings(JSON.parse(savedSettings));
     }
 
-    // Загрузка пользователей с backend
-    fetch("/api/v1/users")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Пользователи из API:", data); // <-- добавьте это
-        setUsers(data);
-      })
-      .catch(() => setUsers([]));
+    // Дефолтные пользователи
+    const defaultUsers: User[] = [
+      {
+        id: "1",
+        name: "Администратор",
+        email: "admin@krokos.com",
+        password: "admin123",
+        role: "admin",
+      },
+      {
+        id: "2",
+        name: "Редактор",
+        email: "editor@krokos.com",
+        password: "editor123",
+        role: "editor",
+      },
+      {
+        id: "3",
+        name: "Наблюдатель",
+        email: "viewer@krokos.com",
+        password: "viewer123",
+        role: "viewer",
+      },
+    ];
+
+    // Загрузка пользователей только из localStorage, если нет — записать дефолтных
+    const savedUsers = localStorage.getItem("app-users");
+    if (savedUsers) {
+      setUsers(JSON.parse(savedUsers));
+    } else {
+      setUsers(defaultUsers);
+      localStorage.setItem("app-users", JSON.stringify(defaultUsers));
+    }
   }, []);
 
   const handleSave = async () => {
@@ -142,46 +167,25 @@ const Settings: React.FC = () => {
     }
 
     try {
-      let response;
+      let updatedUsers;
       if (currentUser.id) {
         // Редактирование существующего пользователя
-        response = await fetch(`/api/v1/users/${currentUser.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: currentUser.name,
-            email: currentUser.email,
-            password: currentUser.password || "",
-            role: currentUser.role,
-          }),
-        });
+        updatedUsers = users.map((u) =>
+          u.id === currentUser.id ? { ...u, ...currentUser } : u
+        );
       } else {
         // Добавление нового пользователя
-        response = await fetch("/api/v1/users/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: currentUser.name,
-            email: currentUser.email,
-            password: currentUser.password,
-            role: currentUser.role,
-          }),
-        });
+        const newUser = {
+          ...currentUser,
+          id: Date.now().toString(),
+        };
+        updatedUsers = [...users, newUser];
       }
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Ошибка при сохранении пользователя");
-      }
-
+      setUsers(updatedUsers);
+      localStorage.setItem("app-users", JSON.stringify(updatedUsers));
       toast.success(`Пользователь ${currentUser.email} сохранён`);
       setIsUserModalOpen(false);
       setCurrentUser(null);
-
-      // Перезагрузить пользователей с backend
-      fetch("/api/v1/users")
-        .then((res) => res.json())
-        .then((data) => setUsers(data));
     } catch (error: any) {
       toast.error(error.message || "Ошибка при сохранении пользователя");
     }
@@ -191,20 +195,12 @@ const Settings: React.FC = () => {
     if (!userToDelete) return;
 
     try {
-      const response = await fetch(`/api/v1/users/${userToDelete.id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Ошибка при удалении пользователя");
-      }
+      const updatedUsers = users.filter((u) => u.id !== userToDelete.id);
+      setUsers(updatedUsers);
+      localStorage.setItem("app-users", JSON.stringify(updatedUsers));
       toast.success(`Пользователь ${userToDelete.email} удалён`);
       setIsDeleteConfirmOpen(false);
       setUserToDelete(null);
-      // Перезагрузить пользователей с backend
-      fetch("/api/v1/users")
-        .then((res) => res.json())
-        .then((data) => setUsers(data));
     } catch (error: any) {
       toast.error(error.message || "Ошибка при удалении пользователя");
     }

@@ -16,17 +16,25 @@ const Registration: React.FC = () => {
     setError("");
     setSuccess(false);
     try {
-      const response = await fetch("/api/v1/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Ошибка регистрации");
+      // Получаем текущих пользователей из localStorage
+      const usersRaw = localStorage.getItem("app-users");
+      const users = usersRaw ? JSON.parse(usersRaw) : [];
+      // Проверка на уникальность email
+      if (users.some((u: any) => u.email === email)) {
+        throw new Error("Пользователь с таким email уже существует");
       }
-      const user = await response.json();
-      localStorage.setItem("user_data", JSON.stringify(user));
+      // Создаём нового пользователя
+      const newUser = {
+        id: Date.now().toString(),
+        name,
+        email,
+        password,
+        role: "viewer",
+        createdAt: Date.now(),
+      };
+      const updatedUsers = [...users, newUser];
+      localStorage.setItem("app-users", JSON.stringify(updatedUsers));
+      localStorage.setItem("user_data", JSON.stringify(newUser));
       setSuccess(true);
       setName("");
       setEmail("");

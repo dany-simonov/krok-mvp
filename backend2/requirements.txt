@@ -4,4 +4,7 @@ sqlalchemy
 python-multipart
 python-dotenv
 pydantic
+pydantic[email]
 pydantic-settings
+passlib
+bcrypt

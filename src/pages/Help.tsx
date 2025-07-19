@@ -102,7 +102,7 @@ return (
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Справка и поддержка
+            Справка
           </h1>
           <p className="text-gray-600 mt-1">
             Документация, руководства и техническая поддержка
@@ -110,7 +110,7 @@ return (
         </div>
       </div>
 
-      {/* Search */}
+      {/* Search
       <Card>
         <CardContent className="pt-6">
           <div className="flex gap-2">
@@ -127,9 +127,9 @@ return (
             <Button onClick={handleSearch}>Найти</Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
-      {/* Quick Links */}
+      {/* Quick Links
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
           <CardHeader>
@@ -184,7 +184,7 @@ return (
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* FAQ */}
       <Card>
@@ -241,7 +241,7 @@ return (
         </CardContent>
       </Card>
       
-      {/* Contact Support */}
+      {/* Contact Support
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -284,7 +284,7 @@ return (
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
             {/* Чат поддержки */}
       {isChatOpen && (
         <div className="fixed bottom-6 right-6 w-80 z-50">
